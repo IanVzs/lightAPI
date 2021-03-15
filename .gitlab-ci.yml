@@ -1,0 +1,42 @@
+---
+image: golang:1.15
+
+stages:
+  - test
+  - bak
+  - update
+
+before_script:
+  - whoami
+  - ls ~/.ssh/
+
+bak:
+  stage: bak
+  script:
+    - pwd
+    - whoami
+    - go version
+    - ssh ianvzs@localhost -i ~/.ssh/ianvzs.rsa "cd ~/lightAPI/ && git pull origin main && mkdir ~/lightAPI_bak -p && tar cfvz ~/lightAPI_bak/lightAPI_`date +%y%m%d`.tar.gz ~/lightAPI/* && exit"
+  only:
+    - branches
+  tags:
+    - localhost
+
+tests:
+  stage: test
+  script:
+    - ls
+    - export GOPROXY=https://goproxy.io,direct
+    - export GOPRIVATE=git.mycompany.com,github.com/my/private
+    - go build
+  tags:
+    - localhost
+
+update:
+  stage: update
+  script:
+    - ssh ianvzs@localhost -i ~/.ssh/ianvzs.rsa "cd ~/lightAPI/ && git pull origin main && make build && supervisorctl -c /home/ianvzs/gpx_d/supervisord.conf restart lightAPI && exit"
+  only:
+    - main
+  tags:
+    - localhost
