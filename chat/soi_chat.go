@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/IanVzs/lightAPI/flag_parse"
 	"github.com/IanVzs/lightAPI/log"
 	"github.com/IanVzs/lightAPI/rds"
 )
@@ -82,9 +83,9 @@ func ChatAlert(w http.ResponseWriter, req *http.Request) {
 		listAction := strings.Split(actions[0], ",")
 		log.Logger.Info("get token: ", token)
 		if token != "" {
-			deToken := Decrypt2String(*log.KeyAPI, token)
+			deToken := Decrypt2String(*flag_parse.KeyAPI, token)
 			log.Logger.Info("get deToken", deToken)
-			listToken := strings.Split(deToken, *log.KeySplit)
+			listToken := strings.Split(deToken, *flag_parse.KeySplit)
 			// listToken := strings.Split("hahaha_._heihei_._wwawa", "_._")
 			if len(listToken) < 2 {
 				chatID, uid, userType = "", "", ""

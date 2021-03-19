@@ -1,12 +1,13 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 
 	"github.com/IanVzs/lightAPI/chat"
+	"github.com/IanVzs/lightAPI/flag_parse"
 	"github.com/IanVzs/lightAPI/log"
+	"github.com/IanVzs/lightAPI/rds"
 )
 
 func hello(w http.ResponseWriter, r *http.Request) {
@@ -23,13 +24,13 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "hello\n")
 }
 func init() {
-	flag.Parse()
 }
 func main() {
+	defer rds.Client.Close()
 	http.HandleFunc("/", hello)
 	http.HandleFunc("/chat/polling", chat.ChatAlert)
-	log.Logger.Info("server run: " + *log.Addr)
-	err := http.ListenAndServe(*log.Addr, nil)
+	log.Logger.Info("server run: " + *flag_parse.Addr)
+	err := http.ListenAndServe(*flag_parse.Addr, nil)
 	if err != nil {
 		log.Logger.Fatal("ListenAndServe: ", err)
 	}
